@@ -30,16 +30,42 @@ interface Balance {
 }
 
 const Dashboard: React.FC = () => {
-  // const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // const [balance, setBalance] = useState<Balance>({} as Balance);
+  const [transaction, setNewTransaction] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState<Balance>({} as Balance);
+
+  // function transfer() {
+  //   //consumir a api
+  //   //listar o ballance
+  //   //adicionar o tipo de transferência
+  //   //mostrar o resultado no ballance
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      // TODO
+      const response = await api.get('/transactions');
+
+      const TransactionsInTheFormat = response.data.transactions.map(
+        (trans: Transaction) => ({
+          ...trans,
+          formattedValue: formatValue(trans.value),
+        }),
+      );
+
+      const balanceInTheFormat = {
+        income: formatValue(response.data.balance.income),
+        outcome: formatValue(response.data.balance.outcome),
+        total: formatValue(response.data.balance.total),
+      };
+
+      setNewTransaction(TransactionsInTheFormat);
+      setBalance(balanceInTheFormat);
     }
 
     loadTransactions();
   }, []);
+
+  // function transactionMade() {
+  //   return paraPorra;
+  // }
 
   return (
     <>
@@ -51,21 +77,21 @@ const Dashboard: React.FC = () => {
               <p>Entradas</p>
               <img src={income} alt="Income" />
             </header>
-            <h1 data-testid="balance-income">R$ 5.000,00</h1>
+            <h1 data-testid="balance-income">{balance.income}</h1>
           </Card>
           <Card>
             <header>
               <p>Saídas</p>
               <img src={outcome} alt="Outcome" />
             </header>
-            <h1 data-testid="balance-outcome">R$ 1.000,00</h1>
+            <h1 data-testid="balance-outcome">{balance.outcome}</h1>
           </Card>
           <Card total>
             <header>
               <p>Total</p>
               <img src={total} alt="Total" />
             </header>
-            <h1 data-testid="balance-total">R$ 4000,00</h1>
+            <h1 data-testid="balance-total">{balance.total}</h1>
           </Card>
         </CardContainer>
 
